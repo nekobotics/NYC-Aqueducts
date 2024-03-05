@@ -1,16 +1,47 @@
 #include <Adafruit_NeoPixel.h>
 
 #define Pixel_Pin 9
-#define NUMPIXELS 180
-#define BRIGHTNESS 80
+#define NUMPIXELS 156
+#define BRIGHTNESS 255
 
 const int Length = 20;
-int ColorHue[Length];
 
-int StripLength;
-int NumStrips;
+struct Color {
+  int RedHue[Length];
+  int GreenHue[Length];
+  int BlueHue[Length];
+  int LastRed;
+  int LastGreen;
+  int LastBlue;
+};
 
-int LastPixel;
+Color StreamOne;
+Color StreamTwo;
+
+int ColorHueOne[Length];
+int ColorHueTwo[Length];
+int ColorHueThree[Length];
+int ColorHueFour[Length];
+
+
+const int StripTwoLength = 36;
+const int StripOneLength = 125;
+
+unsigned long time;
+
+int StripLengthOne;
+int NumStripsOne;
+int StripLengthTwo;
+int NumStripsTwo;
+
+int LastPixel1;
+int LastPixel2;
+
+unsigned long StripOneTime;
+long StripOneDelay = 10;
+
+unsigned long StripTwoTime;
+long StripTwoDelay = 10;
 
 Adafruit_NeoPixel strip(NUMPIXELS, Pixel_Pin, NEO_GRBW + NEO_KHZ800);
 
@@ -21,27 +52,82 @@ void setup() {
   strip.setBrightness(255);
   Serial.begin(9600);
 
-  NumStrips = NUMPIXELS/Length;
-  StripLength = NUMPIXELS/NumStrips;
+  NumStripsOne = StripOneLength/Length;
+  NumStripsTwo = StripTwoLength/Length;
 
   for(int x=0; x < Length; x++){
-    ColorHue[x]= (180/2)-((180/2) * sin(x * ((3.14)/Length)));
-    Serial.println(ColorHue[x]);
+    StreamOne.BlueHue[x]= (200/2)-((200/2) * sin(x * ((3.14)/Length)));
+    StreamTwo.GreenHue[x]= (206/2)-((206/2) * sin(x * ((3.14)/Length)));
+    StreamTwo.RedHue[x]= (135/2)-((135/2) * sin(x * ((3.14)/Length)));
+    StreamTwo.BlueHue[x]= (220/2)-((220/2) * sin(x * ((3.14)/Length)));
+    //Serial.println(ColorHue[x]);
+  }
+}
+
+void StripOne(){
+  for(int  i= 0; i < NumStripsOne+1; i++){
+    for(int x = 0; x < Length; x++){
+      if((i*Length)+x <= StripOneLength){strip.setPixelColor((x+(i*(Length))),0,0,StreamOne.BlueHue[x]+30);}
+    }
+  }
+}
+
+void StripTwo(){
+ for(int  i= 0; i < NumStripsTwo+1; i++){
+    for(int x = 0; x < Length; x++){
+      strip.setPixelColor((x+(i*(Length)))+125,StreamTwo.RedHue[x],StreamTwo.GreenHue[x],StreamTwo.BlueHue[x]+30);
+    }
   }
 }
 
 void loop() {
-  for(int  i= 0; i < NumStrips+1; i++){
-    for(int x = 0; x < StripLength; x++){strip.setPixelColor((x+(i*(StripLength-1))),0,ColorHue[x],180);}
+  time = millis();
+
+  if(time >= StripOneTime + StripOneDelay){
+    StripOne();
+
+
+    StreamOne.LastBlue = StreamOne.BlueHue[Length-1];
+    StreamOne.LastGreen = StreamOne.GreenHue[Length-1];
+    StreamOne.LastRed = StreamOne.RedHue[Length-1];
+    for(int x = (Length-1); x >= 0; x--){
+      if(x!=0){
+        StreamOne.BlueHue[x]=StreamOne.BlueHue[x-1];
+        StreamOne.GreenHue[x]=StreamOne.GreenHue[x-1];
+        StreamOne.RedHue[x]=StreamOne.RedHue[x-1];
+      } 
+      else {
+        StreamOne.BlueHue[x]=StreamOne.LastBlue;
+        StreamOne.GreenHue[x]=StreamOne.LastGreen;
+        StreamOne.RedHue[x]=StreamOne.LastRed;
+      }
+    }
+
+    StripOneTime = time;
+  }
+
+  if(time >= StripTwoTime + StripTwoDelay){
+    StripTwo();
+
+
+    StreamTwo.LastBlue = StreamTwo.BlueHue[Length-1];
+    StreamTwo.LastGreen = StreamTwo.GreenHue[Length-1];
+    StreamTwo.LastRed = StreamTwo.RedHue[Length-1];
+    for(int x = (Length-1); x >= 0; x--){
+      if(x!=0){
+        StreamTwo.BlueHue[x]=StreamTwo.BlueHue[x-1];
+        StreamTwo.GreenHue[x]=StreamTwo.GreenHue[x-1];
+        StreamTwo.RedHue[x]=StreamTwo.RedHue[x-1];
+      } 
+      else {
+        StreamTwo.BlueHue[x]=StreamTwo.LastBlue;
+        StreamTwo.GreenHue[x]=StreamTwo.LastGreen;
+        StreamTwo.RedHue[x]=StreamTwo.LastRed;
+      }
+    }
+
+    StripTwoTime = time;
   }
 
   strip.show();
-  delay(15);
-
-  LastPixel = ColorHue[Length-1];
-  for(int x = (Length-1); x >= 0; x--){
-    if(x!=0){ColorHue[x]=ColorHue[x-1];} 
-    else {ColorHue[x]=LastPixel;}
-  }
-  
 }
