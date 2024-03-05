@@ -1,7 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 
 #define Pixel_Pin 9
-#define NUMPIXELS 156
+#define NUMPIXELS 155
 #define BRIGHTNESS 255
 
 const int Length = 20;
@@ -19,7 +19,7 @@ Color StreamOne;
 Color StreamTwo;
 
 const int StripTwoLength = 36;
-const int StripOneLength = 125;
+const int StripOneLength = 119;
 
 unsigned long time;
 
@@ -66,7 +66,7 @@ void StripOne(){
 void StripTwo(){
  for(int  i= 0; i < NumStripsTwo+1; i++){
     for(int x = 0; x < Length; x++){
-      strip.setPixelColor((x+(i*(Length)))+125,StreamTwo.RedHue[x],StreamTwo.GreenHue[x],StreamTwo.BlueHue[x]+30);
+      strip.setPixelColor((x+(i*(Length)))+120,StreamTwo.RedHue[x],StreamTwo.GreenHue[x],StreamTwo.BlueHue[x]+30);
     }
   }
 }
