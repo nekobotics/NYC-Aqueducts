@@ -18,30 +18,21 @@ struct Color {
 Color StreamOne;
 Color StreamTwo;
 
-int ColorHueOne[Length];
-int ColorHueTwo[Length];
-int ColorHueThree[Length];
-int ColorHueFour[Length];
-
-
 const int StripTwoLength = 36;
 const int StripOneLength = 125;
 
 unsigned long time;
 
-int StripLengthOne;
+struct Time{
+  unsigned long LastTriggered;
+  long Delay;
+};
+
+Time StreamOneTime = {0,10};
+Time StreamTwoTime = {0,7};
+
 int NumStripsOne;
-int StripLengthTwo;
 int NumStripsTwo;
-
-int LastPixel1;
-int LastPixel2;
-
-unsigned long StripOneTime;
-long StripOneDelay = 10;
-
-unsigned long StripTwoTime;
-long StripTwoDelay = 10;
 
 Adafruit_NeoPixel strip(NUMPIXELS, Pixel_Pin, NEO_GRBW + NEO_KHZ800);
 
@@ -83,7 +74,7 @@ void StripTwo(){
 void loop() {
   time = millis();
 
-  if(time >= StripOneTime + StripOneDelay){
+  if(time >= StreamOneTime.LastTriggered + StreamOneTime.Delay){
     StripOne();
 
 
@@ -103,10 +94,10 @@ void loop() {
       }
     }
 
-    StripOneTime = time;
+    StreamOneTime.LastTriggered = time;
   }
 
-  if(time >= StripTwoTime + StripTwoDelay){
+  if(time >= StreamTwoTime.LastTriggered + StreamTwoTime.Delay){
     StripTwo();
 
 
@@ -126,7 +117,7 @@ void loop() {
       }
     }
 
-    StripTwoTime = time;
+    StreamTwoTime.LastTriggered = time;
   }
 
   strip.show();
