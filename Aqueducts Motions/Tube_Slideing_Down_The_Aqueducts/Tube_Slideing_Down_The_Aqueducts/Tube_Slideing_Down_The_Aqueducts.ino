@@ -81,7 +81,6 @@ void loop() {
   if(Currenttime >= StreamOneTime.LastTriggered + StreamOneTime.Delay){
     StripOne();
 
-
     StreamOne.LastBlue = StreamOne.BlueHue[Length-1];
     StreamOne.LastGreen = StreamOne.GreenHue[Length-1];
     StreamOne.LastRed = StreamOne.RedHue[Length-1];
