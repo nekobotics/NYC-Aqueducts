@@ -2,7 +2,7 @@
 
 #define DATA_PIN 9
 #define CLOCK_PIN 19
-#define NUMPIXELS 909
+#define NUMPIXELS 945
 
 CRGB leds[NUMPIXELS];
 
@@ -42,7 +42,7 @@ struct StreamControls {
 
   void run(){
     for(int x = DuctStart; x < DuctStart+DuctLength; x++){
-      leds[x] = CRGB(BlueHue[x-(Length *(x/Length))], GreenHue[x - (Length *(x/Length))], RedHue[x- (Length *(x/Length))]);
+      leds[x] = CRGB(BlueHue[Length-1 - (x-(Length *(x/Length)))], GreenHue[Length-1 - (x - (Length *(x/Length)))], RedHue[Length-1 - (x- (Length *(x/Length)))]);
     }
     update();
   }
@@ -88,6 +88,10 @@ void setup() {
     Delaware.GreenHue[x]= (250/2)-((220/2) * sin(x * ((3.14)/Length)));
     Serial.println(Delaware.GreenHue[x]);
   }
+
+  for(int x = 909; x < NUMPIXELS; x++){
+    leds[x] = CRGB(0,0,250);
+  }
 }
 
 void loop() {
@@ -109,6 +113,7 @@ void loop() {
     Croton.run();
     CrotonTime.LastTriggered = CurrentTime;
   }
+
 
   FastLED.show();
   delay(10);
